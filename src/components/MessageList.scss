@@ -1,0 +1,51 @@
+.message-list {
+  @apply flex flex-col gap-4 p-4;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.message {
+  @apply flex gap-3 max-w-[80%];
+  
+  &.user-message {
+    @apply self-end flex-row-reverse;
+    
+    .message-content {
+      @apply items-end;
+    }
+    
+    .message-bubble {
+      background: $user-message-bg;
+      color: white;
+    }
+  }
+  
+  &.bot-message {
+    @apply self-start;
+    
+    .message-bubble {
+      background: $bot-message-bg;
+      color: $fluent-text;
+    }
+  }
+}
+
+.message-avatar {
+  @apply flex-shrink-0;
+}
+
+.message-content {
+  @apply flex flex-col gap-1;
+}
+
+.message-bubble {
+  @apply px-4 py-2 rounded-2xl max-w-full break-words;
+  border-radius: $message-border-radius;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.message-time {
+  @apply opacity-60;
+  font-size: 11px;
+}

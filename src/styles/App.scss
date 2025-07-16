@@ -1,0 +1,11 @@
+.app {
+  @apply h-full w-full flex items-center justify-center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.app-container {
+  @apply w-full max-w-4xl h-full max-h-[800px] rounded-lg shadow-2xl;
+  background: $fluent-surface;
+  border: 1px solid $fluent-border;
+}
