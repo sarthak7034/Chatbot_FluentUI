@@ -39,7 +39,7 @@ const Chatbot: React.FC = () => {
   }, [messages, isTyping])
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim() || !isConnected) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -67,11 +67,11 @@ const Chatbot: React.FC = () => {
         <Avatar 
           icon={<Bot24Regular />}
           color="brand"
-          size={40}
+          size={48}
         />
         <div className="header-info">
-          <Text weight="semibold" size={500}>AI Assistant</Text>
-          <Text size={200} className="status-text">
+          <Text weight="semibold" size={600}>AI Assistant</Text>
+          <Text size={300} className="status-text">
             {isConnected ? 'Online' : 'Connecting...'}
           </Text>
         </div>
@@ -87,8 +87,12 @@ const Chatbot: React.FC = () => {
               size={32}
             />
             <div className="typing-bubble">
-              <Spinner size="tiny" />
-              <Text size={200}>AI is typing...</Text>
+              <div className="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <Text size={300}>AI is thinking...</Text>
             </div>
           </div>
         )}
@@ -100,14 +104,15 @@ const Chatbot: React.FC = () => {
           value={inputValue}
           onChange={(_, data) => setInputValue(data.value)}
           onKeyDown={handleKeyPress}
-          placeholder="Type your message..."
+          placeholder="Ask me anything... ✨"
           className="message-input"
           contentAfter={
             <Button
               appearance="transparent"
               icon={<Send24Regular />}
               onClick={handleSendMessage}
-              disabled={!inputValue.trim()}
+              disabled={!inputValue.trim() || !isConnected}
+              title={!isConnected ? 'Connecting...' : 'Send message'}
             />
           }
         />

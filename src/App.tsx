@@ -1,6 +1,6 @@
-import React from 'react'
-import Chatbot from './components/Chatbot'
-import './styles/App.scss'
+import React from "react";
+import Chatbot from "./components/Chatbot";
+import "./styles/App.scss";
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
         <Chatbot />
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

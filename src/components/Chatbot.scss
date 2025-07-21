@@ -1,42 +1,190 @@
 .chatbot {
   @apply h-full flex flex-col;
+  border-radius: inherit;
+  overflow: hidden;
 }
 
 .chatbot-header {
-  @apply flex items-center gap-3 p-4 border-b;
+  @apply flex items-center gap-4 border-b;
+  padding: $chat-padding;
+  height: $header-height;
   border-color: $fluent-border;
-  background: $fluent-surface;
+  background: linear-gradient(135deg, $fluent-surface 0%, #f8fafc 100%);
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, $fluent-border 50%, transparent 100%);
+  }
 }
 
 .header-info {
-  @apply flex flex-col;
+  @apply flex flex-col gap-1;
+  flex: 1;
 }
 
 .status-text {
   color: $fluent-text-secondary;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $success-color;
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .chatbot-messages {
   @apply flex-1 flex flex-col overflow-hidden;
   min-height: 0;
+  background: linear-gradient(180deg, $fluent-surface 0%, #fefefe 100%);
 }
 
 .typing-indicator {
-  @apply flex items-center gap-3 px-4 py-2;
+  @apply flex items-center gap-3;
+  padding: 12px $chat-padding;
+  animation: slideInUp 0.3s ease-out;
   
   .typing-bubble {
-    @apply flex items-center gap-2 px-3 py-2 rounded-2xl;
+    @apply flex items-center gap-3 px-4 py-3 rounded-2xl;
     background: $bot-message-bg;
-    border-radius: $message-border-radius;
+    border: 1px solid $bot-message-border;
+    box-shadow: $message-shadow;
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 8px solid $bot-message-bg;
+    }
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  
+  span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $fluent-primary;
+    animation: typingDot 1.4s infinite ease-in-out;
+    
+    &:nth-child(1) { animation-delay: 0s; }
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+@keyframes typingDot {
+  0%, 60%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  30% {
+    transform: scale(1.2);
+    opacity: 1;
   }
 }
 
 .chatbot-input {
-  @apply p-4 border-t;
+  @apply border-t;
+  padding: $chat-padding;
+  height: $input-height;
   border-color: $fluent-border;
   background: $fluent-surface;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, $fluent-border 50%, transparent 100%);
+  }
 }
 
 .message-input {
   @apply w-full;
+  border-radius: 24px !important;
+  border: 2px solid $fluent-border !important;
+  transition: all $transition-normal;
+  background: #fafafa;
+  bottom: 9px;
+  
+  &:hover {
+    border-color: $fluent-primary !important;
+    background: $fluent-surface;
+  }
+  
+  &:focus-within {
+    border-color: $fluent-primary !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    background: $fluent-surface;
+  }
+  
+  input {
+    padding: 12px 16px !important;
+    font-size: 14px;
+    
+    &::placeholder {
+      color: $fluent-text-secondary;
+      font-weight: 400;
+    }
+  }
+  
+  button {
+    margin-right: 8px;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    transition: all $transition-fast;
+    
+    &:hover:not(:disabled) {
+      background: $fluent-primary !important;
+      color: white !important;
+      transform: scale(1.05);
+    }
+    
+    &:disabled {
+      opacity: 0.4;
+    }
+  }
 }

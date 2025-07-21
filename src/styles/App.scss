@@ -1,11 +1,40 @@
 .app {
   @apply h-full w-full flex items-center justify-center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f8fafc 100%);
+  padding: 24px;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
 }
 
 .app-container {
-  @apply w-full max-w-4xl h-full max-h-[800px] rounded-lg shadow-2xl;
+  @apply w-full max-w-5xl h-full max-h-[900px] rounded-2xl shadow-2xl;
   background: $fluent-surface;
   border: 1px solid $fluent-border;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    border-radius: inherit;
+    z-index: -1;
+  }
 }

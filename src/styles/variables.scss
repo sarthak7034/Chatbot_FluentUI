@@ -1,17 +1,32 @@
-// Fluent UI Colors
-$fluent-bg: #faf9f8;
+// Modern Color Palette
+$fluent-bg: #f8fafc;
 $fluent-surface: #ffffff;
-$fluent-primary: #0078d4;
-$fluent-secondary: #605e5c;
-$fluent-border: #e1dfdd;
-$fluent-text: #323130;
-$fluent-text-secondary: #605e5c;
+$fluent-primary: #3b82f6;
+$fluent-secondary: #64748b;
+$fluent-border: #e2e8f0;
+$fluent-text: #1e293b;
+$fluent-text-secondary: #64748b;
 
-// Chat specific colors
-$user-message-bg: #0078d4;
-$bot-message-bg: #f3f2f1;
-$message-border-radius: 18px;
+// Enhanced Chat Colors
+$user-message-bg: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+$bot-message-bg: #f1f5f9;
+$bot-message-border: #e2e8f0;
+$message-border-radius: 20px;
+$message-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-// Spacing
-$chat-padding: 16px;
-$message-spacing: 12px;
+// Interactive States
+$hover-bg: #f8fafc;
+$focus-ring: #3b82f6;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+
+// Spacing & Layout
+$chat-padding: 20px;
+$message-spacing: 16px;
+$header-height: 80px;
+$input-height: 60px;
+
+// Animations
+$transition-fast: 0.15s ease-out;
+$transition-normal: 0.25s ease-out;
+$transition-slow: 0.35s ease-out;
