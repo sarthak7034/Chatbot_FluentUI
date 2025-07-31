@@ -1,0 +1,62 @@
+// Responsive mixins and utilities
+
+// Container mixin with responsive max-widths
+@mixin container($breakpoint: 'desktop') {
+  width: 100%;
+  margin: 0 auto;
+  
+  @if $breakpoint == 'mobile' {
+    max-width: 100%;
+    padding: 0 16px;
+  } @else if $breakpoint == 'tablet' {
+    max-width: 100%;
+    padding: 0 24px;
+  } @else if $breakpoint == 'desktop' {
+    max-width: 800px;
+    padding: 0 32px;
+  } @else if $breakpoint == 'large' {
+    max-width: 1000px;
+    padding: 0 40px;
+  }
+}
+
+// Responsive spacing mixin
+@mixin responsive-spacing($property: 'padding', $mobile: 16px, $tablet: 24px, $desktop: 32px, $large: 40px) {
+  #{$property}: $mobile;
+  
+  @include tablet-up {
+    #{$property}: $tablet;
+  }
+  
+  @include desktop-up {
+    #{$property}: $desktop;
+  }
+  
+  @include large {
+    #{$property}: $large;
+  }
+}
+
+// Touch target mixin
+@mixin touch-target($size: 44px) {
+  min-width: $size;
+  min-height: $size;
+  
+  @include desktop-up {
+    min-width: 32px;
+    min-height: 32px;
+  }
+}
+
+// Responsive font size mixin
+@mixin responsive-font($mobile: 14px, $tablet: 15px, $desktop: 16px) {
+  font-size: $mobile;
+  
+  @include tablet-up {
+    font-size: $tablet;
+  }
+  
+  @include desktop-up {
+    font-size: $desktop;
+  }
+}
