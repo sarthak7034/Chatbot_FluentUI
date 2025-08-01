@@ -1,0 +1,206 @@
+@import '../../styles/variables.scss';
+
+.message-error-boundary {
+  margin: var(--spacing-xs) 0;
+  border-radius: var(--border-radius-sm);
+
+  &__message {
+    border-radius: var(--border-radius-sm);
+    box-shadow: none;
+    border: 1px solid var(--color-warning-border);
+  }
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    min-height: 40px;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-xs);
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    flex: 1;
+  }
+
+  &__title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-warning-text);
+  }
+
+  &__details {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    opacity: 0.8;
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+    flex-shrink: 0;
+
+    @media (max-width: 480px) {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+
+  &__retry-btn,
+  &__dismiss-btn {
+    min-width: auto;
+    height: 28px;
+    padding: 0 var(--spacing-sm);
+    font-size: var(--font-size-xs);
+
+    &:hover {
+      background-color: var(--color-warning-hover);
+    }
+  }
+
+  &__debug {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
+
+    summary {
+      cursor: pointer;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-xs);
+
+      &:hover {
+        color: var(--color-text);
+      }
+    }
+  }
+
+  &__debug-content {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+
+    p {
+      margin: var(--spacing-xs) 0;
+    }
+
+    strong {
+      font-weight: var(--font-weight-medium);
+    }
+  }
+
+  &__stack {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    background-color: var(--color-background);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin-top: var(--spacing-xs);
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  // Dismissed state
+  &--dismissed {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    opacity: 0.6;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &__placeholder {
+    font-style: italic;
+    flex: 1;
+  }
+
+  &__restore-btn {
+    min-width: auto;
+    height: 24px;
+    padding: 0 var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+      background-color: var(--color-primary-hover);
+    }
+  }
+
+  // Dark theme support
+  [data-theme='dark'] & {
+    &__message {
+      border-color: var(--color-warning-border-dark);
+    }
+
+    &__title {
+      color: var(--color-warning-text-dark);
+    }
+
+    &__debug {
+      background-color: var(--color-surface-dark);
+      border-color: var(--color-border-dark);
+    }
+
+    &__stack {
+      background-color: var(--color-background-dark);
+    }
+
+    &--dismissed {
+      background-color: var(--color-surface-dark);
+      border-color: var(--color-border-dark);
+    }
+  }
+
+  // High contrast theme support
+  @media (prefers-contrast: high) {
+    &__message {
+      border-width: 2px;
+    }
+
+    &__title {
+      font-weight: var(--font-weight-bold);
+    }
+
+    &--dismissed {
+      border-width: 2px;
+    }
+  }
+
+  // Reduced motion support
+  @media (prefers-reduced-motion: reduce) {
+    &__retry-btn,
+    &__dismiss-btn,
+    &__restore-btn {
+      transition: none;
+    }
+
+    &--dismissed {
+      transition: none;
+    }
+  }
+}

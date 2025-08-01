@@ -3,6 +3,8 @@
  * Provides utilities for responsive design and breakpoint management
  */
 
+import { prefersReducedMotion } from './accessibility';
+
 export interface Breakpoints {
   mobile: number;
   tablet: number;
@@ -105,12 +107,7 @@ export const isTouchDevice = (): boolean => {
   );
 };
 
-/**
- * Check if user prefers reduced motion
- */
-export const prefersReducedMotion = (): boolean => {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-};
+// prefersReducedMotion moved to accessibility.ts to avoid duplicate exports
 
 /**
  * Get device orientation

@@ -1,4 +1,3 @@
-import React from "react";
 import Chatbot from "./components/Chatbot";
 import "./styles/App.scss";
 
