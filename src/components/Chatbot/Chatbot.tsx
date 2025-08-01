@@ -1,19 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Button,
-  Input,
-  Avatar,
-  Text,
-  Spinner,
-} from "@fluentui/react-components";
-import {
-  Send24Regular,
-  Bot24Regular,
-  Person24Regular,
-} from "@fluentui/react-icons";
+import { Button, Input, Avatar, Text } from "@fluentui/react-components";
+import { Send24Regular, Bot24Regular } from "@fluentui/react-icons";
 import { useSocket } from "../../hooks/useSocket";
 import { Message } from "../../types/chat";
 import MessageList from "../MessageList";
+import { ThemeToggle, StatusIndicator } from "../UI";
+import type { ConnectionStatus } from "../UI";
 import "./Chatbot.scss";
 
 const Chatbot: React.FC = () => {
@@ -29,6 +21,12 @@ const Chatbot: React.FC = () => {
     },
     onTyping: () => setIsTyping(true),
   });
+
+  // Determine connection status for StatusIndicator
+  const getConnectionStatus = (): ConnectionStatus => {
+    if (isConnected) return "connected";
+    return "connecting";
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -64,14 +62,21 @@ const Chatbot: React.FC = () => {
   return (
     <div className="chatbot">
       <div className="chatbot-header">
-        <Avatar icon={<Bot24Regular />} color="brand" size={48} />
-        <div className="header-info">
-          <Text weight="semibold" size={600}>
-            AI Assistant
-          </Text>
-          <Text size={300} className="status-text">
-            {isConnected ? "Online" : "Connecting..."}
-          </Text>
+        <div className="header-left">
+          <Avatar icon={<Bot24Regular />} color="brand" size={48} />
+          <div className="header-info">
+            <Text weight="semibold" size={600}>
+              AI Assistant
+            </Text>
+            <StatusIndicator
+              status={getConnectionStatus()}
+              size="small"
+              showText={true}
+            />
+          </div>
+        </div>
+        <div className="header-right">
+          <ThemeToggle size="medium" />
         </div>
       </div>
 
