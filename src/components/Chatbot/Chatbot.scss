@@ -8,8 +8,9 @@
   @apply flex items-center justify-between border-b;
   padding: $chat-padding;
   height: $header-height;
-  border-color: $fluent-border;
-  background: linear-gradient(135deg, $fluent-surface 0%, #f8fafc 100%);
+  border-color: var(--color-border);
+  background: var(--color-header-background);
+  color: var(--color-text);
   position: relative;
   
   &::after {
@@ -19,7 +20,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, $fluent-border 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, var(--color-border) 50%, transparent 100%);
   }
   
   .header-left {
@@ -38,7 +39,7 @@
 }
 
 .status-text {
-  color: $fluent-text-secondary;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -48,7 +49,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: $success-color;
+    background: var(--color-success);
     animation: pulse 2s infinite;
   }
 }
@@ -61,7 +62,7 @@
 .chatbot-messages {
   @apply flex-1 flex flex-col overflow-hidden;
   min-height: 0;
-  background: linear-gradient(180deg, $fluent-surface 0%, #fefefe 100%);
+  background: var(--color-background);
 }
 
 .typing-indicator {
@@ -71,9 +72,10 @@
   
   .typing-bubble {
     @apply flex items-center gap-3 px-4 py-3 rounded-2xl;
-    background: $bot-message-bg;
-    border: 1px solid $bot-message-border;
+    background: var(--color-bot-message);
+    border: 1px solid var(--color-border);
     box-shadow: $message-shadow;
+    color: var(--color-bot-message-text);
     position: relative;
     
     &::before {
@@ -86,7 +88,7 @@
       height: 0;
       border-top: 8px solid transparent;
       border-bottom: 8px solid transparent;
-      border-right: 8px solid $bot-message-bg;
+      border-right: 8px solid var(--color-bot-message);
     }
   }
 }
@@ -111,7 +113,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: $fluent-primary;
+    background: var(--color-primary);
     animation: typingDot 1.4s infinite ease-in-out;
     
     &:nth-child(1) { animation-delay: 0s; }
@@ -135,8 +137,8 @@
   @apply border-t;
   padding: $chat-padding;
   height: $input-height;
-  border-color: $fluent-border;
-  background: $fluent-surface;
+  border-color: var(--color-border);
+  background: var(--color-surface);
   position: relative;
   
   &::before {
@@ -146,35 +148,35 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, $fluent-border 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, var(--color-border) 50%, transparent 100%);
   }
 }
 
 .message-input {
   @apply w-full;
   border-radius: 24px !important;
-  border: 2px solid $fluent-border !important;
+  border: 2px solid var(--color-input-border) !important;
   transition: all $transition-normal;
-  background: #fafafa;
+  background: var(--color-input-background) !important;
   bottom: 9px;
   
   &:hover {
-    border-color: $fluent-primary !important;
-    background: $fluent-surface;
+    border-color: var(--color-primary) !important;
   }
   
   &:focus-within {
-    border-color: $fluent-primary !important;
+    border-color: var(--color-primary) !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-    background: $fluent-surface;
   }
   
   input {
     padding: 12px 16px !important;
     font-size: 14px;
+    color: var(--color-text) !important;
+    background: transparent !important;
     
     &::placeholder {
-      color: $fluent-text-secondary;
+      color: var(--color-text-secondary) !important;
       font-weight: 400;
     }
   }
@@ -187,7 +189,7 @@
     transition: all $transition-fast;
     
     &:hover:not(:disabled) {
-      background: $fluent-primary !important;
+      background: var(--color-primary) !important;
       color: white !important;
       transform: scale(1.05);
     }

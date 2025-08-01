@@ -1,6 +1,6 @@
 .app {
   @apply h-full w-full flex items-center justify-center;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f8fafc 100%);
+  background: var(--color-background);
   padding: 24px;
   position: relative;
   
@@ -20,8 +20,8 @@
 
 .app-container {
   @apply w-full max-w-5xl h-full max-h-[900px] rounded-2xl shadow-2xl;
-  background: $fluent-surface;
-  border: 1px solid $fluent-border;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   backdrop-filter: blur(10px);
   position: relative;
   z-index: 1;
@@ -33,8 +33,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: var(--color-surface);
     border-radius: inherit;
     z-index: -1;
+    opacity: 0.9;
   }
 }
