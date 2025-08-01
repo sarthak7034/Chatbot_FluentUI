@@ -3,7 +3,7 @@
  * Provides utilities for responsive design and breakpoint management
  */
 
-import { prefersReducedMotion } from './accessibility';
+import { prefersReducedMotion } from "./accessibility";
 
 export interface Breakpoints {
   mobile: number;
@@ -13,10 +13,10 @@ export interface Breakpoints {
 }
 
 export interface ResponsiveState {
-  breakpoint: 'mobile' | 'tablet' | 'desktop' | 'large';
+  breakpoint: "mobile" | "tablet" | "desktop" | "large";
   width: number;
   height: number;
-  orientation: 'portrait' | 'landscape';
+  orientation: "portrait" | "landscape";
   touchDevice: boolean;
   reducedMotion: boolean;
 }
@@ -88,11 +88,11 @@ export const DEFAULT_RESPONSIVE_CONFIG: ResponsiveConfig = {
 export const getCurrentBreakpoint = (
   width: number,
   breakpoints: Breakpoints = DEFAULT_BREAKPOINTS
-): ResponsiveState['breakpoint'] => {
-  if (width < breakpoints.mobile) return 'mobile';
-  if (width < breakpoints.tablet) return 'tablet';
-  if (width < breakpoints.desktop) return 'desktop';
-  return 'large';
+): ResponsiveState["breakpoint"] => {
+  if (width < breakpoints.mobile) return "mobile";
+  if (width < breakpoints.tablet) return "tablet";
+  if (width < breakpoints.desktop) return "desktop";
+  return "large";
 };
 
 /**
@@ -100,7 +100,7 @@ export const getCurrentBreakpoint = (
  */
 export const isTouchDevice = (): boolean => {
   return (
-    'ontouchstart' in window ||
+    "ontouchstart" in window ||
     navigator.maxTouchPoints > 0 ||
     // @ts-ignore - for older browsers
     navigator.msMaxTouchPoints > 0
@@ -112,8 +112,11 @@ export const isTouchDevice = (): boolean => {
 /**
  * Get device orientation
  */
-export const getOrientation = (width: number, height: number): 'portrait' | 'landscape' => {
-  return width > height ? 'landscape' : 'portrait';
+export const getOrientation = (
+  width: number,
+  height: number
+): "portrait" | "landscape" => {
+  return width > height ? "landscape" : "portrait";
 };
 
 /**
@@ -138,7 +141,7 @@ export const createResponsiveState = (
  * Get layout configuration for current breakpoint
  */
 export const getLayoutConfig = (
-  breakpoint: ResponsiveState['breakpoint'],
+  breakpoint: ResponsiveState["breakpoint"],
   config: ResponsiveConfig = DEFAULT_RESPONSIVE_CONFIG
 ): LayoutConfig => {
   return config.layouts[breakpoint];
@@ -150,7 +153,7 @@ export const getLayoutConfig = (
 export const createMediaQuery = (
   breakpoint: keyof Breakpoints,
   breakpoints: Breakpoints = DEFAULT_BREAKPOINTS,
-  type: 'min' | 'max' = 'min'
+  type: "min" | "max" = "min"
 ): string => {
   const width = breakpoints[breakpoint];
   return `(${type}-width: ${width}px)`;
@@ -170,7 +173,7 @@ export const debounce = <T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout;
+  let timeout: number;
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
@@ -199,17 +202,17 @@ export const throttle = <T extends (...args: any[]) => any>(
  */
 export const calculateMessageWidth = (
   viewportWidth: number,
-  breakpoint: ResponsiveState['breakpoint'],
+  breakpoint: ResponsiveState["breakpoint"],
   config: ResponsiveConfig = DEFAULT_RESPONSIVE_CONFIG
 ): number => {
   const layout = config.layouts[breakpoint];
   const maxWidth = layout.maxWidth;
-  
-  if (typeof maxWidth === 'number' && maxWidth < 100) {
+
+  if (typeof maxWidth === "number" && maxWidth < 100) {
     // If maxWidth is a percentage (< 100), treat as percentage
     return Math.min(viewportWidth * (maxWidth / 100), 800);
   }
-  
+
   // Otherwise treat as absolute pixel value
   return Math.min(viewportWidth - layout.padding * 2, maxWidth);
 };
