@@ -5,7 +5,7 @@
 }
 
 .chatbot-header {
-  @apply flex items-center gap-4 border-b;
+  @apply flex items-center justify-between border-b;
   padding: $chat-padding;
   height: $header-height;
   border-color: $fluent-border;
@@ -20,6 +20,15 @@
     right: 0;
     height: 1px;
     background: linear-gradient(90deg, transparent 0%, $fluent-border 50%, transparent 100%);
+  }
+  
+  .header-left {
+    @apply flex items-center gap-4;
+    flex: 1;
+  }
+  
+  .header-right {
+    @apply flex items-center gap-2;
   }
 }
 

@@ -1,0 +1,105 @@
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  
+  .theme-toggle-button {
+    position: relative;
+    transition: all var(--duration-normal, 250ms) var(--easing-ease-in-out, ease-in-out);
+    border-radius: var(--border-radius-md, 0.5rem);
+    
+    // Smooth icon transitions
+    svg {
+      transition: all var(--duration-normal, 250ms) var(--easing-ease-in-out, ease-in-out);
+      transform-origin: center;
+    }
+    
+    // Hover effects
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+      
+      svg {
+        transform: scale(1.1);
+      }
+    }
+    
+    // Active state
+    &:active {
+      transform: translateY(0);
+      transition-duration: var(--duration-fast, 150ms);
+    }
+    
+    // Focus state for accessibility
+    &:focus-visible {
+      outline: 2px solid var(--color-primary, #0078d4);
+      outline-offset: 2px;
+    }
+    
+    // Size variants
+    &.theme-toggle-small {
+      min-width: 32px;
+      min-height: 32px;
+      padding: 4px;
+    }
+    
+    &.theme-toggle-medium {
+      min-width: 40px;
+      min-height: 40px;
+      padding: 8px;
+    }
+    
+    &.theme-toggle-large {
+      min-width: 48px;
+      min-height: 48px;
+      padding: 12px;
+    }
+  }
+  
+  // Theme-specific styling
+  .theme-toggle-button.theme-light {
+    &:hover {
+      background-color: var(--color-surface, #f8f9fa);
+      color: var(--color-primary, #0078d4);
+    }
+  }
+  
+  .theme-toggle-button.theme-dark {
+    &:hover {
+      background-color: var(--color-surface, #2d2d2d);
+      color: var(--color-primary, #4fc3f7);
+    }
+  }
+}
+
+// Animation for theme transitions
+.theme-toggle-button {
+  // Icon rotation animation for smooth transitions
+  &[aria-pressed="true"] svg {
+    animation: theme-toggle-spin var(--duration-normal, 250ms) var(--easing-ease-in-out, ease-in-out);
+  }
+}
+
+@keyframes theme-toggle-spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-button,
+  .theme-toggle-button svg {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .theme-toggle-button:hover {
+    transform: none !important;
+  }
+}
