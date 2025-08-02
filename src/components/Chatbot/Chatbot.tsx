@@ -6,6 +6,7 @@ import { Message } from "../../types/chat";
 import MessageList from "../MessageList";
 import { ThemeToggle, StatusIndicator } from "../UI";
 import type { ConnectionStatus } from "../UI";
+import ChatHeader from "./ChatHeader";
 import "./Chatbot.scss";
 
 const Chatbot: React.FC = () => {
@@ -39,14 +40,6 @@ const Chatbot: React.FC = () => {
   const handleSendMessage = () => {
     if (!inputValue.trim() || !isConnected) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputValue,
-      sender: "user",
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
     sendMessage(inputValue);
     setInputValue("");
     setIsTyping(true);
@@ -61,24 +54,11 @@ const Chatbot: React.FC = () => {
 
   return (
     <div className="chatbot">
-      <div className="chatbot-header">
-        <div className="header-left">
-          <Avatar icon={<Bot24Regular />} color="brand" size={48} />
-          <div className="header-info">
-            <Text weight="semibold" size={600}>
-              AI Assistant
-            </Text>
-            <StatusIndicator
-              status={getConnectionStatus()}
-              size="small"
-              showText={true}
-            />
-          </div>
-        </div>
-        <div className="header-right">
-          <ThemeToggle size="medium" />
-        </div>
-      </div>
+      <ChatHeader
+        title="AI Assistant"
+        isConnected={isConnected}
+        showThemeToggle={true}
+      />
 
       <div className="chatbot-messages">
         <MessageList messages={messages} />

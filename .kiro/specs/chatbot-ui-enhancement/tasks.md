@@ -78,8 +78,10 @@
     - Ensure all colors and spacing use theme variables
     - _Requirements: 7.1, 7.3_
 
-- [ ] 6. Enhance message data models and types
-  - [ ] 6.1 Extend Message interface with enhanced features
+- [x] 6. Enhance message data models and types
+
+  - [x] 6.1 Extend Message interface with enhanced features
+
     - Add status field (sending, sent, failed) to Message interface
     - Add metadata field for reactions, editing, and threading
     - Create enhanced message types for different content states
@@ -87,9 +89,9 @@
 
 ## Component Modularization and Enhancement Tasks
 
-- [ ] 7. Extract and enhance chat header component
+- [x] 7. Extract and enhance chat header component
 
-  - [ ] 7.1 Extract ChatHeader component from existing Chatbot header
+  - [x] 7.1 Extract ChatHeader component from existing Chatbot header
 
     - Extract header section from Chatbot.tsx into standalone ChatHeader component
     - Maintain current functionality with ThemeToggle and StatusIndicator integration
@@ -108,12 +110,12 @@
 
     - Create message grouping logic by time periods
     - Implement enhanced timestamp display with relative/absolute options
-    - Add message status indicators (sending, sent, failed)
+    - Add message status indicators (sending, sent, failed) to existing MessageList
     - _Requirements: 4.1, 4.3, 4.5_
 
   - [ ] 8.2 Create individual Message component with animations
 
-    - Build standalone Message component with proper styling
+    - Extract individual message rendering from MessageList into standalone Message component
     - Implement smooth message appearance animations
     - Add message density optimization for compact display
     - _Requirements: 1.2, 1.4, 3.4_

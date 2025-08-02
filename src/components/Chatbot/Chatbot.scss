@@ -4,60 +4,7 @@
   overflow: hidden;
 }
 
-.chatbot-header {
-  @apply flex items-center justify-between border-b;
-  padding: $chat-padding;
-  height: $header-height;
-  border-color: var(--color-border);
-  background: var(--color-header-background);
-  color: var(--color-text);
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, var(--color-border) 50%, transparent 100%);
-  }
-  
-  .header-left {
-    @apply flex items-center gap-4;
-    flex: 1;
-  }
-  
-  .header-right {
-    @apply flex items-center gap-2;
-  }
-}
-
-.header-info {
-  @apply flex flex-col gap-1;
-  flex: 1;
-}
-
-.status-text {
-  color: var(--color-text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  
-  &::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--color-success);
-    animation: pulse 2s infinite;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
+// Header styles moved to ChatHeader.scss
 
 .chatbot-messages {
   @apply flex-1 flex flex-col overflow-hidden;

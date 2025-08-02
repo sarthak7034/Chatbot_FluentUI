@@ -1,41 +1,50 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Message, SocketCallbacks } from '../types/chat'
-import { mockResponses } from '../data/mockData'
+import {
+  SocketCallbacks,
+  createUserMessage,
+  createBotMessage,
+  updateMessageStatus,
+} from "../types/chat";
+import { mockResponses } from "../data/mockData";
 
 export const useSocket = ({ onMessage, onTyping }: SocketCallbacks) => {
-  const [isConnected, setIsConnected] = useState(false)
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     // Simulate connection
     const timer = setTimeout(() => {
-      setIsConnected(true)
-    }, 1000)
+      setIsConnected(true);
+    }, 1000);
 
-    return () => clearTimeout(timer)
-  }, [])
+    return () => clearTimeout(timer);
+  }, []);
 
-  const sendMessage = useCallback((text: string) => {
-    // Simulate typing indicator
-    onTyping()
+  const sendMessage = useCallback(
+    (text: string) => {
+      // Create user message with sending status
+      const userMessage = createUserMessage(text);
 
-    // Simulate network delay and bot response
-    setTimeout(() => {
-      const response = getRandomResponse(text)
-      const botMessage: Message = {
-        id: Date.now().toString(),
-        text: response,
-        sender: 'bot',
-        timestamp: new Date()
-      }
-      onMessage(botMessage)
-    }, 1000 + Math.random() * 2000) // 1-3 seconds delay
-  }, [onMessage, onTyping])
+      // Send user message immediately with sending status
+      onMessage(userMessage);
+
+      // Simulate typing indicator
+      onTyping();
+
+      // Simulate network delay and bot response
+      setTimeout(() => {
+        const response = getRandomResponse(text);
+        const botMessage = createBotMessage(response);
+        onMessage(botMessage);
+      }, 1000 + Math.random() * 2000); // 1-3 seconds delay
+    },
+    [onMessage, onTyping]
+  );
 
   return {
     sendMessage,
-    isConnected
-  }
-}
+    isConnected,
+  };
+};
 
 const getRandomResponse = (userMessage: string): string => {
   const lowerMessage = userMessage.toLowerCase()
