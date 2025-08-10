@@ -1,353 +1,278 @@
-/**
- * Performance monitoring utilities and optimization helpers
- * Provides tools for measuring and optimizing application performance
- */
+// Performance monitoring utilities for virtual scrolling and chat optimization
 
-export interface PerformanceMetrics {
+interface PerformanceMetrics {
   renderTime: number;
-  componentCount: number;
-  memoryUsage?: number;
-  bundleSize?: number;
+  memoryUsage: number;
+  scrollPerformance: number;
+  messageCount: number;
   timestamp: number;
 }
 
-export interface PerformanceConfig {
-  enableLogging: boolean;
-  enableMemoryTracking: boolean;
-  sampleRate: number;
-  maxMetricsHistory: number;
+interface ScrollPerformanceData {
+  scrollTop: number;
+  scrollHeight: number;
+  clientHeight: number;
+  timestamp: number;
+  fps: number;
 }
 
-// Default performance configuration
-export const DEFAULT_PERFORMANCE_CONFIG: PerformanceConfig = {
-  enableLogging: import.meta.env.DEV,
-  enableMemoryTracking: "memory" in performance,
-  sampleRate: 1.0, // 100% sampling in development
-  maxMetricsHistory: 100,
-};
+class PerformanceMonitor {
+  private metrics: PerformanceMetrics[] = [];
+  private scrollData: ScrollPerformanceData[] = [];
+  private frameCount = 0;
+  private lastFrameTime = 0;
+  private isMonitoring = false;
 
-// Performance metrics storage
-let metricsHistory: PerformanceMetrics[] = [];
-let config: PerformanceConfig = DEFAULT_PERFORMANCE_CONFIG;
-
-/**
- * Initialize performance monitoring
- */
-export const initPerformanceMonitoring = (
-  customConfig?: Partial<PerformanceConfig>
-): void => {
-  config = { ...DEFAULT_PERFORMANCE_CONFIG, ...customConfig };
-
-  if (config.enableLogging) {
-    console.log("Performance monitoring initialized", config);
+  // Start performance monitoring
+  startMonitoring(): void {
+    this.isMonitoring = true;
+    this.frameCount = 0;
+    this.lastFrameTime = performance.now();
   }
-};
 
-/**
- * Measure component render time
- */
-export const measureRenderTime = <T extends (...args: any[]) => any>(
-  componentName: string,
-  renderFunction: T
-): T => {
-  return ((...args: any[]) => {
-    if (!shouldSample()) return renderFunction(...args);
+  // Stop performance monitoring
+  stopMonitoring(): void {
+    this.isMonitoring = false;
+  }
 
-    const startTime = performance.now();
-    const result = renderFunction(...args);
-    const endTime = performance.now();
+  // Record render performance
+  recordRenderTime(startTime: number, messageCount: number): void {
+    if (!this.isMonitoring) return;
 
-    recordMetric(
-      {
-        renderTime: endTime - startTime,
-        componentCount: 1,
-        timestamp: Date.now(),
-      },
-      componentName
+    const renderTime = performance.now() - startTime;
+    const memoryUsage = this.getMemoryUsage();
+
+    const metric: PerformanceMetrics = {
+      renderTime,
+      memoryUsage,
+      scrollPerformance: this.calculateScrollPerformance(),
+      messageCount,
+      timestamp: Date.now(),
+    };
+
+    this.metrics.push(metric);
+
+    // Keep only last 100 metrics to prevent memory leaks
+    if (this.metrics.length > 100) {
+      this.metrics = this.metrics.slice(-100);
+    }
+  }
+
+  // Record scroll performance
+  recordScrollPerformance(scrollElement: HTMLElement): void {
+    if (!this.isMonitoring) return;
+
+    const now = performance.now();
+    const fps = this.calculateFPS(now);
+
+    const scrollData: ScrollPerformanceData = {
+      scrollTop: scrollElement.scrollTop,
+      scrollHeight: scrollElement.scrollHeight,
+      clientHeight: scrollElement.clientHeight,
+      timestamp: now,
+      fps,
+    };
+
+    this.scrollData.push(scrollData);
+
+    // Keep only last 50 scroll data points
+    if (this.scrollData.length > 50) {
+      this.scrollData = this.scrollData.slice(-50);
+    }
+  }
+
+  // Get memory usage (if available)
+  private getMemoryUsage(): number {
+    if ('memory' in performance) {
+      const memory = (performance as any).memory;
+      return memory.usedJSHeapSize / 1024 / 1024; // Convert to MB
+    }
+    return 0;
+  }
+
+  // Calculate FPS
+  private calculateFPS(currentTime: number): number {
+    this.frameCount++;
+    const deltaTime = currentTime - this.lastFrameTime;
+
+    if (deltaTime >= 1000) {
+      const fps = (this.frameCount * 1000) / deltaTime;
+      this.frameCount = 0;
+      this.lastFrameTime = currentTime;
+      return Math.round(fps);
+    }
+
+    return 60; // Default assumption
+  }
+
+  // Calculate scroll performance score
+  private calculateScrollPerformance(): number {
+    if (this.scrollData.length < 2) return 100;
+
+    const recent = this.scrollData.slice(-10);
+    const avgFps = recent.reduce((sum, data) => sum + data.fps, 0) / recent.length;
+    
+    // Score based on FPS (60 FPS = 100 score)
+    return Math.min(100, (avgFps / 60) * 100);
+  }
+
+  // Get performance summary
+  getPerformanceSummary(): {
+    averageRenderTime: number;
+    averageMemoryUsage: number;
+    averageScrollPerformance: number;
+    totalMessages: number;
+    recommendations: string[];
+  } {
+    if (this.metrics.length === 0) {
+      return {
+        averageRenderTime: 0,
+        averageMemoryUsage: 0,
+        averageScrollPerformance: 100,
+        totalMessages: 0,
+        recommendations: [],
+      };
+    }
+
+    const recent = this.metrics.slice(-20); // Last 20 measurements
+    const averageRenderTime = recent.reduce((sum, m) => sum + m.renderTime, 0) / recent.length;
+    const averageMemoryUsage = recent.reduce((sum, m) => sum + m.memoryUsage, 0) / recent.length;
+    const averageScrollPerformance = recent.reduce((sum, m) => sum + m.scrollPerformance, 0) / recent.length;
+    const totalMessages = recent[recent.length - 1]?.messageCount || 0;
+
+    const recommendations = this.generateRecommendations(
+      averageRenderTime,
+      averageMemoryUsage,
+      averageScrollPerformance,
+      totalMessages
     );
 
-    return result;
-  }) as T;
-};
-
-/**
- * Create a performance mark
- */
-export const mark = (name: string): void => {
-  if (performance.mark) {
-    performance.mark(name);
-  }
-};
-
-/**
- * Measure time between two marks
- */
-export const measure = (
-  name: string,
-  startMark: string,
-  endMark?: string
-): number => {
-  if (!performance.measure || !performance.getEntriesByName) {
-    return 0;
+    return {
+      averageRenderTime: Math.round(averageRenderTime * 100) / 100,
+      averageMemoryUsage: Math.round(averageMemoryUsage * 100) / 100,
+      averageScrollPerformance: Math.round(averageScrollPerformance),
+      totalMessages,
+      recommendations,
+    };
   }
 
-  try {
-    performance.measure(name, startMark, endMark);
-    const entries = performance.getEntriesByName(name, "measure");
-    return entries.length > 0 ? entries[entries.length - 1].duration : 0;
-  } catch (error) {
-    console.warn("Performance measurement failed:", error);
-    return 0;
+  // Generate performance recommendations
+  private generateRecommendations(
+    renderTime: number,
+    memoryUsage: number,
+    scrollPerformance: number,
+    messageCount: number
+  ): string[] {
+    const recommendations: string[] = [];
+
+    if (renderTime > 16) {
+      recommendations.push("Consider enabling virtual scrolling for better render performance");
+    }
+
+    if (memoryUsage > 50) {
+      recommendations.push("High memory usage detected. Consider reducing cached message count");
+    }
+
+    if (scrollPerformance < 80) {
+      recommendations.push("Scroll performance is below optimal. Check for heavy components in messages");
+    }
+
+    if (messageCount > 1000 && renderTime > 10) {
+      recommendations.push("Large message count with slow rendering. Virtual scrolling is recommended");
+    }
+
+    if (messageCount > 500 && !recommendations.length) {
+      recommendations.push("Consider enabling virtual scrolling for optimal performance with large message lists");
+    }
+
+    return recommendations;
   }
-};
 
-/**
- * Get current memory usage (if available)
- */
-export const getMemoryUsage = (): number | undefined => {
-  if (!config.enableMemoryTracking) return undefined;
-
-  // @ts-ignore - memory API is not in all browsers
-  const memory = (performance as any).memory;
-  if (memory) {
-    return memory.usedJSHeapSize;
+  // Clear all metrics
+  clearMetrics(): void {
+    this.metrics = [];
+    this.scrollData = [];
+    this.frameCount = 0;
   }
 
-  return undefined;
-};
+  // Export metrics for analysis
+  exportMetrics(): {
+    metrics: PerformanceMetrics[];
+    scrollData: ScrollPerformanceData[];
+  } {
+    return {
+      metrics: [...this.metrics],
+      scrollData: [...this.scrollData],
+    };
+  }
+}
 
-/**
- * Record performance metric
- */
-export const recordMetric = (
-  metric: Omit<PerformanceMetrics, "memoryUsage">,
-  context?: string
-): void => {
-  if (!shouldSample()) return;
+// Global performance monitor instance
+export const performanceMonitor = new PerformanceMonitor();
 
-  const fullMetric: PerformanceMetrics = {
-    ...metric,
-    memoryUsage: getMemoryUsage(),
+// Hook for using performance monitoring in React components
+export const usePerformanceMonitoring = (enabled: boolean = false) => {
+  const startRender = (): number => {
+    return performance.now();
   };
 
-  // Add to history
-  metricsHistory.push(fullMetric);
+  const endRender = (startTime: number, messageCount: number): void => {
+    if (enabled) {
+      performanceMonitor.recordRenderTime(startTime, messageCount);
+    }
+  };
 
-  // Limit history size
-  if (metricsHistory.length > config.maxMetricsHistory) {
-    metricsHistory = metricsHistory.slice(-config.maxMetricsHistory);
-  }
+  const recordScroll = (element: HTMLElement): void => {
+    if (enabled) {
+      performanceMonitor.recordScrollPerformance(element);
+    }
+  };
 
-  // Log if enabled
-  if (config.enableLogging && context) {
-    console.log(`Performance [${context}]:`, fullMetric);
-  }
-};
-
-/**
- * Get performance metrics history
- */
-export const getMetricsHistory = (): PerformanceMetrics[] => {
-  return [...metricsHistory];
-};
-
-/**
- * Clear metrics history
- */
-export const clearMetricsHistory = (): void => {
-  metricsHistory = [];
-};
-
-/**
- * Calculate average render time
- */
-export const getAverageRenderTime = (lastN?: number): number => {
-  const metrics = lastN ? metricsHistory.slice(-lastN) : metricsHistory;
-  if (metrics.length === 0) return 0;
-
-  const totalTime = metrics.reduce((sum, metric) => sum + metric.renderTime, 0);
-  return totalTime / metrics.length;
-};
-
-/**
- * Detect performance issues
- */
-export const detectPerformanceIssues = (): {
-  slowRenders: number;
-  memoryLeaks: boolean;
-  recommendations: string[];
-} => {
-  const slowRenderThreshold = 16; // 16ms for 60fps
-  const slowRenders = metricsHistory.filter(
-    (m) => m.renderTime > slowRenderThreshold
-  ).length;
-
-  // Simple memory leak detection
-  const recentMetrics = metricsHistory.slice(-10);
-  const memoryTrend =
-    recentMetrics.length > 1
-      ? recentMetrics[recentMetrics.length - 1].memoryUsage! -
-        recentMetrics[0].memoryUsage!
-      : 0;
-  const memoryLeaks = memoryTrend > 1024 * 1024; // 1MB increase
-
-  const recommendations: string[] = [];
-
-  if (slowRenders > metricsHistory.length * 0.1) {
-    recommendations.push(
-      "Consider using React.memo for frequently re-rendering components"
-    );
-    recommendations.push("Check for expensive calculations in render methods");
-  }
-
-  if (memoryLeaks) {
-    recommendations.push(
-      "Potential memory leak detected - check for uncleared intervals/timeouts"
-    );
-    recommendations.push("Review event listeners and ensure proper cleanup");
-  }
+  const getSummary = () => {
+    return performanceMonitor.getPerformanceSummary();
+  };
 
   return {
-    slowRenders,
-    memoryLeaks,
-    recommendations,
+    startRender,
+    endRender,
+    recordScroll,
+    getSummary,
+    monitor: performanceMonitor,
   };
 };
 
-/**
- * Optimize bundle size analysis
- */
-export const analyzeBundleSize = (): Promise<{
-  totalSize: number;
-  recommendations: string[];
-}> => {
-  return new Promise((resolve) => {
-    // This would typically integrate with webpack-bundle-analyzer
-    // For now, provide basic analysis
-    const recommendations: string[] = [
-      "Use dynamic imports for code splitting",
-      "Remove unused dependencies",
-      "Optimize images and assets",
-      "Enable gzip compression",
-    ];
+// Utility functions for memory management
+export const memoryUtils = {
+  // Estimate message memory usage
+  estimateMessageMemoryUsage: (messages: any[]): number => {
+    const sampleSize = Math.min(messages.length, 10);
+    if (sampleSize === 0) return 0;
 
-    resolve({
-      totalSize: 0, // Would be calculated from actual bundle
-      recommendations,
-    });
-  });
-};
+    const sample = messages.slice(0, sampleSize);
+    const avgSize = sample.reduce((sum, msg) => {
+      return sum + JSON.stringify(msg).length * 2; // Rough estimate (UTF-16)
+    }, 0) / sampleSize;
 
-/**
- * Debounced performance logger
- */
-export const debouncedLog = debounce((message: string, data?: any) => {
-  if (config.enableLogging) {
-    console.log(message, data);
-  }
-}, 100);
-
-/**
- * Check if we should sample this performance measurement
- */
-const shouldSample = (): boolean => {
-  return Math.random() < config.sampleRate;
-};
-
-/**
- * Simple debounce utility
- */
-function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: number;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-}
-
-/**
- * React performance optimization helpers
- */
-export const optimizationHelpers = {
-  /**
-   * Create a memoized component comparison function
-   */
-  createMemoComparison:
-    <T extends Record<string, any>>(keys: (keyof T)[]) =>
-    (prevProps: T, nextProps: T): boolean => {
-      return keys.every((key) => prevProps[key] === nextProps[key]);
-    },
-
-  /**
-   * Check if an object has changed (shallow comparison)
-   */
-  hasChanged: <T extends Record<string, any>>(prev: T, next: T): boolean => {
-    const prevKeys = Object.keys(prev);
-    const nextKeys = Object.keys(next);
-
-    if (prevKeys.length !== nextKeys.length) return true;
-
-    return prevKeys.some((key) => prev[key] !== next[key]);
+    return (avgSize * messages.length) / 1024 / 1024; // Convert to MB
   },
 
-  /**
-   * Create a stable callback reference
-   */
-  createStableCallback: <T extends (...args: any[]) => any>(callback: T): T => {
-    // This would typically use useCallback in a React context
-    // Here we provide the logic for manual optimization
-    return callback;
+  // Check if memory optimization is needed
+  shouldOptimizeMemory: (messageCount: number, memoryUsage: number): boolean => {
+    return messageCount > 1000 || memoryUsage > 100; // 100MB threshold
+  },
+
+  // Get optimal cache size based on available memory
+  getOptimalCacheSize: (availableMemory: number): number => {
+    // Conservative approach: use max 10% of available memory for message cache
+    const maxMemoryForCache = availableMemory * 0.1;
+    const avgMessageSize = 0.5; // KB per message (rough estimate)
+    
+    return Math.floor(maxMemoryForCache / avgMessageSize);
   },
 };
 
-/**
- * Virtual scrolling performance helpers
- */
-export const virtualScrollHelpers = {
-  /**
-   * Calculate visible items for virtual scrolling
-   */
-  calculateVisibleItems: (
-    scrollTop: number,
-    containerHeight: number,
-    itemHeight: number,
-    totalItems: number,
-    overscan: number = 5
-  ): { startIndex: number; endIndex: number; visibleItems: number } => {
-    const startIndex = Math.max(
-      0,
-      Math.floor(scrollTop / itemHeight) - overscan
-    );
-    const visibleItems = Math.ceil(containerHeight / itemHeight);
-    const endIndex = Math.min(
-      totalItems - 1,
-      startIndex + visibleItems + overscan * 2
-    );
-
-    return { startIndex, endIndex, visibleItems };
-  },
-
-  /**
-   * Calculate scroll position for item
-   */
-  getScrollPositionForItem: (itemIndex: number, itemHeight: number): number => {
-    return itemIndex * itemHeight;
-  },
-};
-
-// Export performance monitoring instance
-export const performanceMonitor = {
-  init: initPerformanceMonitoring,
-  measureRender: measureRenderTime,
-  mark,
-  measure,
-  record: recordMetric,
-  getHistory: getMetricsHistory,
-  clear: clearMetricsHistory,
-  getAverage: getAverageRenderTime,
-  detect: detectPerformanceIssues,
-  analyze: analyzeBundleSize,
+export default {
+  performanceMonitor,
+  usePerformanceMonitoring,
+  memoryUtils,
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useMemo } from "react";
 import { Button, Tooltip } from "@fluentui/react-components";
 import {
   WeatherSunny24Regular,
@@ -14,70 +14,73 @@ interface ThemeToggleProps {
   className?: string;
 }
 
-const ThemeToggle: React.FC<ThemeToggleProps> = ({
-  size = "medium",
-  showLabel = false,
-  className = "",
-}) => {
-  const { themeMode, toggleTheme, effectiveTheme, isSystemDark } = useTheme();
+const ThemeToggle: React.FC<ThemeToggleProps> = memo(
+  ({ size = "medium", showLabel = false, className = "" }) => {
+    const { themeMode, toggleTheme, effectiveTheme, isSystemDark } = useTheme();
 
-  const getIcon = () => {
-    switch (themeMode) {
-      case "light":
-        return <WeatherSunny24Regular />;
-      case "dark":
-        return <WeatherMoon24Regular />;
-      case "auto":
-        return <Settings24Regular />;
-      default:
-        return <WeatherSunny24Regular />;
-    }
-  };
+    // Memoized icon based on theme mode
+    const icon = useMemo(() => {
+      switch (themeMode) {
+        case "light":
+          return <WeatherSunny24Regular />;
+        case "dark":
+          return <WeatherMoon24Regular />;
+        case "auto":
+          return <Settings24Regular />;
+        default:
+          return <WeatherSunny24Regular />;
+      }
+    }, [themeMode]);
 
-  const getTooltipText = () => {
-    switch (themeMode) {
-      case "light":
-        return "Switch to dark theme";
-      case "dark":
-        return "Switch to light theme";
-      case "auto":
-        return `Auto theme (currently ${effectiveTheme}${
-          isSystemDark ? " - system prefers dark" : " - system prefers light"
-        })`;
-      default:
-        return "Toggle theme";
-    }
-  };
+    // Memoized tooltip text
+    const tooltipText = useMemo(() => {
+      switch (themeMode) {
+        case "light":
+          return "Switch to dark theme";
+        case "dark":
+          return "Switch to light theme";
+        case "auto":
+          return `Auto theme (currently ${effectiveTheme}${
+            isSystemDark ? " - system prefers dark" : " - system prefers light"
+          })`;
+        default:
+          return "Toggle theme";
+      }
+    }, [themeMode, effectiveTheme, isSystemDark]);
 
-  const getLabel = () => {
-    switch (themeMode) {
-      case "light":
-        return "Light";
-      case "dark":
-        return "Dark";
-      case "auto":
-        return "Auto";
-      default:
-        return "Theme";
-    }
-  };
+    // Memoized label text
+    const label = useMemo(() => {
+      switch (themeMode) {
+        case "light":
+          return "Light";
+        case "dark":
+          return "Dark";
+        case "auto":
+          return "Auto";
+        default:
+          return "Theme";
+      }
+    }, [themeMode]);
 
-  return (
-    <div className={`theme-toggle ${className}`}>
-      <Tooltip content={getTooltipText()} relationship="label">
-        <Button
-          appearance="subtle"
-          icon={getIcon()}
-          onClick={toggleTheme}
-          size={size}
-          className={`theme-toggle-button theme-toggle-${size} theme-${effectiveTheme}`}
-          aria-label={getTooltipText()}
-        >
-          {showLabel && getLabel()}
-        </Button>
-      </Tooltip>
-    </div>
-  );
-};
+    return (
+      <div className={`theme-toggle ${className}`}>
+        <Tooltip content={tooltipText} relationship="label">
+          <Button
+            appearance="subtle"
+            icon={icon}
+            onClick={toggleTheme}
+            size={size}
+            className={`theme-toggle-button theme-toggle-${size} theme-${effectiveTheme}`}
+            aria-label={tooltipText}
+          >
+            {showLabel && label}
+          </Button>
+        </Tooltip>
+      </div>
+    );
+  }
+);
+
+ThemeToggle.displayName = "ThemeToggle";
 
 export default ThemeToggle;

@@ -1,6 +1,6 @@
-@import '../../styles/variables.scss';
-@import '../../styles/responsive/_breakpoints.scss';
-@import '../../styles/responsive/_mixins.scss';
+@import "../../styles/variables.scss";
+@import "../../styles/responsive/_breakpoints.scss";
+@import "../../styles/responsive/_mixins.scss";
 
 .chat-header {
   @apply flex items-center justify-between border-b;
@@ -11,43 +11,48 @@
   color: var(--color-text);
   position: relative;
   transition: all $transition-normal;
-  
+
   // Subtle gradient border effect
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, var(--color-border) 50%, transparent 100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-border) 50%,
+      transparent 100%
+    );
   }
-  
+
   // Compact variant
   &--compact {
     height: 60px;
     padding: 12px $chat-padding;
-    
+
     .chat-header__info {
       gap: 2px;
     }
-    
+
     .chat-header__title {
       font-size: 14px;
     }
   }
-  
+
   // Responsive design
   @include mobile {
     padding: 16px;
     height: 70px;
-    
+
     &--compact {
       height: 56px;
       padding: 10px 16px;
     }
   }
-  
+
   @include tablet {
     padding: 18px;
     height: 75px;
@@ -59,7 +64,7 @@
   gap: 16px;
   flex: 1;
   min-width: 0; // Prevent flex item from overflowing
-  
+
   @include mobile {
     gap: 12px;
   }
@@ -74,7 +79,7 @@
 .chat-header__avatar {
   flex-shrink: 0;
   transition: transform $transition-fast;
-  
+
   &:hover {
     transform: scale(1.05);
   }
@@ -85,7 +90,7 @@
   gap: 4px;
   flex: 1;
   min-width: 0; // Prevent text overflow
-  
+
   @include mobile {
     gap: 2px;
   }
@@ -96,22 +101,22 @@
   line-height: 1.2;
   cursor: default;
   transition: color $transition-fast;
-  
+
   // If clickable, add interactive styles
   &[role="button"] {
     cursor: pointer;
-    
+
     &:hover {
       color: var(--color-primary);
     }
-    
+
     &:focus {
       outline: 2px solid var(--color-focus-ring);
       outline-offset: 2px;
       border-radius: 4px;
     }
   }
-  
+
   // Responsive text truncation
   @include mobile {
     font-size: 16px;
@@ -124,7 +129,7 @@
 .chat-header__status {
   @apply flex items-center;
   gap: 8px;
-  
+
   @include mobile {
     gap: 6px;
   }
@@ -136,7 +141,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  
+
   @include mobile {
     display: none; // Hide subtitle on mobile to save space
   }
@@ -146,12 +151,12 @@
   // Additional spacing and styling for theme toggle in header context
   .theme-toggle-button {
     transition: all $transition-fast;
-    
+
     &:hover {
       background: var(--color-hover-bg);
       transform: scale(1.05);
     }
-    
+
     &:focus {
       outline: 2px solid var(--color-focus-ring);
       outline-offset: 2px;
@@ -163,7 +168,7 @@
 @media (prefers-contrast: high) {
   .chat-header {
     border-bottom: 2px solid var(--color-border);
-    
+
     &::after {
       display: none;
     }
@@ -178,20 +183,248 @@
   .chat-header__theme-toggle .theme-toggle-button {
     transition: none;
   }
-  
+
   .chat-header__avatar:hover {
     transform: none;
   }
 }
 
-// Focus-visible support for better keyboard navigation
-.chat-header__title:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
-  border-radius: 4px;
+// Enhanced focus management and keyboard navigation
+.chat-header {
+  // Ensure proper focus containment
+  &:focus-within {
+    .chat-header__title[role="button"] {
+      position: relative;
+    }
+  }
 }
 
-.chat-header__theme-toggle .theme-toggle-button:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
+.chat-header__title {
+  // Enhanced focus styles for better accessibility
+  &:focus,
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+    background: var(--color-focus-bg, rgba(0, 120, 212, 0.1));
+  }
+
+  // Ensure proper heading semantics when not clickable
+  &[role="heading"] {
+    cursor: default;
+
+    h1 {
+      margin: 0;
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+    }
+  }
+
+  // Enhanced interactive states for clickable titles
+  &[role="button"] {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    transition: all $transition-fast;
+
+    &:hover {
+      color: var(--color-primary);
+      background: var(--color-hover-bg, rgba(0, 120, 212, 0.05));
+    }
+
+    &:active {
+      background: var(--color-active-bg, rgba(0, 120, 212, 0.15));
+      transform: translateY(1px);
+    }
+
+    // Ensure minimum touch target size (44px)
+    @include mobile {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 8px 4px;
+      margin: -8px -4px;
+    }
+  }
+}
+
+// Enhanced responsive subtitle handling
+.chat-header__subtitle {
+  // Improved text truncation with better UX
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+
+  // Show full text on focus for accessibility
+  &:focus {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    background: var(--color-tooltip-bg, rgba(0, 0, 0, 0.8));
+    color: var(--color-tooltip-text, white);
+    padding: 4px 8px;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 1000;
+    max-width: 300px;
+  }
+
+  @include mobile {
+    display: none; // Hide subtitle on mobile to save space
+  }
+
+  @include tablet {
+    max-width: 150px; // Limit width on tablet
+  }
+}
+
+// Enhanced status group accessibility
+.chat-header__status {
+  // Ensure proper spacing and alignment
+  align-items: center;
+
+  // Improve focus management within status group
+  &:focus-within {
+    outline: 1px solid var(--color-focus-ring);
+    outline-offset: 1px;
+    border-radius: 4px;
+  }
+}
+
+// Enhanced theme toggle accessibility
+.chat-header__theme-toggle {
+  // Ensure minimum touch target size
+  .theme-toggle-button {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:focus,
+    &:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    // Enhanced hover and active states
+    &:hover {
+      background: var(--color-hover-bg);
+      transform: scale(1.05);
+    }
+
+    &:active {
+      background: var(--color-active-bg);
+      transform: scale(0.98);
+    }
+  }
+}
+
+// Enhanced responsive design with better breakpoint handling
+@include mobile {
+  .chat-header {
+    // Ensure proper touch targets on mobile
+    .chat-header__left {
+      min-height: 44px;
+    }
+
+    .chat-header__right {
+      min-height: 44px;
+    }
+
+    // Improve text readability on small screens
+    .chat-header__title {
+      font-size: 16px !important; // Ensure readable text size
+      line-height: 1.4;
+    }
+  }
+}
+
+@include tablet {
+  .chat-header {
+    // Balanced spacing for tablet
+    .chat-header__info {
+      gap: 6px;
+    }
+
+    .chat-header__title {
+      font-size: 18px;
+      line-height: 1.3;
+    }
+  }
+}
+
+// High contrast mode enhancements
+@media (prefers-contrast: high) {
+  .chat-header {
+    border-bottom: 3px solid var(--color-border);
+
+    .chat-header__title {
+      &:focus,
+      &:focus-visible {
+        outline: 3px solid var(--color-focus-ring);
+        outline-offset: 3px;
+      }
+
+      &[role="button"]:hover {
+        background: var(--color-hover-bg);
+        border: 2px solid var(--color-primary);
+      }
+    }
+
+    .chat-header__theme-toggle .theme-toggle-button {
+      &:focus,
+      &:focus-visible {
+        outline: 3px solid var(--color-focus-ring);
+        outline-offset: 3px;
+      }
+    }
+  }
+}
+
+// Reduced motion accessibility
+@media (prefers-reduced-motion: reduce) {
+  .chat-header,
+  .chat-header__avatar,
+  .chat-header__title,
+  .chat-header__theme-toggle .theme-toggle-button {
+    transition: none;
+  }
+
+  .chat-header__avatar:hover,
+  .chat-header__title[role="button"]:active,
+  .chat-header__theme-toggle .theme-toggle-button:hover,
+  .chat-header__theme-toggle .theme-toggle-button:active {
+    transform: none;
+  }
+}
+
+// Screen reader optimizations
+@media (prefers-reduced-motion: reduce) {
+  .chat-header__subtitle:focus {
+    transition: none;
+  }
+}
+
+// Print styles for accessibility
+@media print {
+  .chat-header {
+    border-bottom: 2px solid black;
+    background: white;
+    color: black;
+
+    .chat-header__theme-toggle {
+      display: none; // Hide theme toggle in print
+    }
+
+    .chat-header__subtitle {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+    }
+  }
 }

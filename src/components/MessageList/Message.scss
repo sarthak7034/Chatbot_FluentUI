@@ -1,0 +1,498 @@
+@import "../../styles/variables.scss";
+
+.message {
+  @apply flex gap-3 max-w-[85%];
+  margin-bottom: 4px;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  transition: all $transition-normal;
+
+  // Animation states
+  &.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  &.animating {
+    transition: opacity $transition-normal ease-out,
+      transform $transition-normal cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  // Grouping styles
+  &.group-start {
+    margin-top: 16px;
+
+    &:first-child {
+      margin-top: 8px;
+    }
+  }
+
+  &.group-continue {
+    margin-top: 2px;
+
+    .message-bubble {
+      &::after,
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  // Density variations
+  &.density-compact {
+    margin-bottom: 2px;
+    gap: 8px;
+
+    &.group-start {
+      margin-top: 12px;
+    }
+
+    &.group-continue {
+      margin-top: 1px;
+    }
+
+    .message-bubble {
+      padding: 8px 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .message-meta {
+      margin-top: 2px;
+      gap: 4px;
+    }
+
+    .message-time {
+      font-size: 10px;
+    }
+  }
+
+  &.density-comfortable {
+    margin-bottom: 6px;
+    gap: 16px;
+
+    &.group-start {
+      margin-top: 20px;
+    }
+
+    &.group-continue {
+      margin-top: 4px;
+    }
+
+    .message-bubble {
+      padding: 16px 20px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .message-meta {
+      margin-top: 6px;
+      gap: 8px;
+    }
+
+    .message-time {
+      font-size: 12px;
+    }
+  }
+
+  // User message styles
+  &.user-message {
+    @apply self-end flex-row-reverse;
+
+    .message-content {
+      @apply items-end;
+    }
+
+    .message-bubble {
+      background: var(--color-user-message);
+      color: var(--color-user-message-text);
+      position: relative;
+      animation: userMessagePulse 0.3s ease-out;
+
+      &::after {
+        content: "";
+        position: absolute;
+        right: -8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        border-left: 8px solid var(--color-user-message);
+        transition: border-color $transition-fast;
+      }
+    }
+
+    .message-meta {
+      @apply flex-row-reverse;
+      text-align: right;
+
+      .message-time {
+        color: var(--color-user-message-text);
+        opacity: 0.7;
+      }
+    }
+  }
+
+  // Bot message styles
+  &.bot-message {
+    @apply self-start;
+
+    .message-bubble {
+      background: var(--color-bot-message);
+      color: var(--color-bot-message-text);
+      border: 1px solid var(--color-border);
+      position: relative;
+      animation: botMessageSlide 0.4s ease-out;
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: -8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        border-right: 8px solid var(--color-bot-message);
+        transition: border-color $transition-fast;
+      }
+    }
+  }
+
+  // Hover effects
+  &:hover {
+    .message-bubble {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .message-time {
+      opacity: 1;
+    }
+
+    .message-avatar {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// Animation keyframes
+@keyframes userMessagePulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes botMessageSlide {
+  0% {
+    transform: translateX(-10px) scale(0.95);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.message-avatar {
+  @apply flex-shrink-0;
+  transition: transform $transition-fast;
+  animation: avatarFadeIn 0.3s ease-out;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes avatarFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.message-avatar-spacer {
+  flex-shrink: 0;
+  transition: width $transition-fast;
+
+  .density-compact & {
+    width: 32px;
+  }
+
+  .density-normal & {
+    width: 36px;
+  }
+
+  .density-comfortable & {
+    width: 40px;
+  }
+}
+
+.message-content {
+  @apply flex flex-col gap-2;
+  min-width: 0;
+  animation: contentSlideIn 0.4s ease-out 0.1s both;
+}
+
+@keyframes contentSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-bubble {
+  @apply px-5 py-3 rounded-2xl max-w-full break-words;
+  border-radius: $message-border-radius;
+  word-wrap: break-word;
+  hyphens: auto;
+  box-shadow: $message-shadow;
+  transition: all $transition-fast;
+  line-height: 1.5;
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+
+  // Subtle shimmer effect for new messages
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    animation: shimmer 1.5s ease-out;
+    pointer-events: none;
+  }
+
+  .message.animating & {
+    &::after {
+      animation: shimmer 1.5s ease-out;
+    }
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.message-edited {
+  @apply opacity-60 italic;
+  margin-left: 8px;
+  font-size: 11px;
+  animation: editedFadeIn 0.3s ease-out;
+}
+
+@keyframes editedFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 0.6;
+    transform: translateX(0);
+  }
+}
+
+.message-meta {
+  @apply flex items-center gap-2;
+  margin-top: 4px;
+  animation: metaFadeIn 0.3s ease-out 0.2s both;
+}
+
+@keyframes metaFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-time {
+  @apply opacity-60;
+  font-size: 11px;
+  font-weight: 500;
+  transition: opacity $transition-fast;
+
+  .message:hover & {
+    opacity: 1;
+  }
+}
+
+.message-status {
+  @apply flex items-center justify-center;
+  width: 16px;
+  height: 16px;
+  transition: all $transition-fast;
+
+  &.sending {
+    color: var(--color-text-secondary);
+    animation: statusPulse 1.5s ease-in-out infinite;
+  }
+
+  &.sent {
+    color: var(--color-success);
+    animation: statusSuccess 0.3s ease-out;
+  }
+
+  &.delivered {
+    color: var(--color-success);
+    opacity: 0.8;
+    animation: statusSuccess 0.3s ease-out;
+  }
+
+  &.failed {
+    color: var(--color-error);
+    cursor: pointer;
+    animation: statusError 0.3s ease-out;
+
+    &:hover {
+      opacity: 0.8;
+      transform: scale(1.1);
+    }
+
+    &:focus {
+      outline: 2px solid var(--color-error);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+}
+
+@keyframes statusPulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes statusSuccess {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes statusError {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+// Reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  .message {
+    animation: none;
+    transition: opacity $transition-fast;
+
+    &.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .message-bubble {
+      &::after {
+        animation: none;
+      }
+    }
+
+    .message-avatar,
+    .message-content,
+    .message-meta,
+    .message-edited {
+      animation: none;
+    }
+
+    .message-status {
+      &.sending {
+        animation: none;
+      }
+
+      &.sent,
+      &.delivered {
+        animation: none;
+      }
+
+      &.failed {
+        animation: none;
+      }
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .message-bubble {
+    border: 2px solid currentColor;
+
+    &::before,
+    &::after {
+      border-width: 10px;
+    }
+  }
+
+  .message-status {
+    &.failed {
+      outline: 1px solid currentColor;
+    }
+  }
+}

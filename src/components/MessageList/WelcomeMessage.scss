@@ -1,0 +1,193 @@
+@import "../../styles/variables.scss";
+
+.welcome-message {
+  @apply flex flex-col items-center justify-center;
+  flex: 1;
+  text-align: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  min-height: 200px;
+
+  // Smooth entrance animation
+  animation: welcomeSlideIn var(--duration-medium) var(--easing-ease-out) both;
+
+  // Accessibility: Respect user's motion preferences
+  @media (prefers-reduced-motion: reduce) {
+    animation: welcomeFadeIn var(--duration-fast) ease-out both;
+  }
+
+  &.reduced-motion {
+    animation: welcomeFadeIn var(--duration-fast) ease-out both;
+  }
+
+  .welcome-avatar {
+    // Add subtle hover effect for interactivity
+    transition: transform var(--duration-fast) var(--easing-ease-out);
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &:hover {
+        transform: none;
+      }
+    }
+
+    .reduced-motion &:hover {
+      transform: none;
+    }
+  }
+
+  .welcome-content {
+    @apply flex flex-col;
+    gap: var(--spacing-sm);
+    max-width: 400px;
+
+    // Responsive max-width
+    @media (max-width: 768px) {
+      max-width: 280px;
+    }
+
+    @media (max-width: 480px) {
+      max-width: 240px;
+    }
+  }
+
+  .welcome-title {
+    color: var(--color-text);
+    line-height: var(--line-height-tight);
+    margin: 0;
+
+    // Add subtle text shadow for better readability
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .welcome-subtitle {
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-normal);
+    margin: 0;
+
+    // Improved readability
+    opacity: 0.9;
+  }
+
+  // Density variations
+  &.density-compact {
+    padding: var(--spacing-lg) var(--spacing-md);
+    gap: var(--spacing-md);
+    min-height: 160px;
+
+    .welcome-content {
+      gap: var(--spacing-xs);
+    }
+  }
+
+  &.density-comfortable {
+    padding: var(--spacing-3xl) var(--spacing-xl);
+    gap: var(--spacing-xl);
+    min-height: 240px;
+
+    .welcome-content {
+      gap: var(--spacing-md);
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    padding: var(--spacing-xl) var(--spacing-md);
+    gap: var(--spacing-md);
+    min-height: 180px;
+
+    &.density-compact {
+      padding: var(--spacing-lg) var(--spacing-sm);
+      min-height: 140px;
+    }
+
+    &.density-comfortable {
+      padding: var(--spacing-2xl) var(--spacing-lg);
+      min-height: 200px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: var(--spacing-lg) var(--spacing-sm);
+    gap: var(--spacing-sm);
+    min-height: 160px;
+
+    &.density-compact {
+      padding: var(--spacing-md) var(--spacing-xs);
+      min-height: 120px;
+    }
+
+    &.density-comfortable {
+      padding: var(--spacing-xl) var(--spacing-md);
+      min-height: 180px;
+    }
+  }
+
+  // High contrast mode support
+  @media (prefers-contrast: high) {
+    .welcome-title {
+      text-shadow: none;
+      font-weight: 600;
+    }
+
+    .welcome-subtitle {
+      opacity: 1;
+      font-weight: 500;
+    }
+  }
+
+  // Dark theme adjustments
+  .theme-dark & {
+    .welcome-title {
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+// Animation keyframes
+@keyframes welcomeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes welcomeFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Focus styles for accessibility
+.welcome-message:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+  border-radius: var(--border-radius-md);
+}
+
+// Loading state (for future use)
+.welcome-message.loading {
+  .welcome-avatar {
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

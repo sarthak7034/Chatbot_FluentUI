@@ -4,3 +4,4 @@ export { StatusIndicator, default as StatusIndicatorDefault } from './StatusIndi
 export type { StatusIndicatorProps, ConnectionStatus } from './StatusIndicator';
 export { default as ChatErrorBoundary } from './ChatErrorBoundary';
 export { default as MessageErrorBoundary } from './MessageErrorBoundary';
+export { default as LoadingSpinner } from './LoadingSpinner';

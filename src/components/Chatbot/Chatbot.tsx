@@ -1,56 +1,109 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button, Input, Avatar, Text } from "@fluentui/react-components";
-import { Send24Regular, Bot24Regular } from "@fluentui/react-icons";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  memo,
+  useCallback,
+  useMemo,
+  Suspense,
+} from "react";
 import { useSocket } from "../../hooks/useSocket";
-import { Message } from "../../types/chat";
+import {
+  Message,
+  createUserMessage,
+  updateMessageStatus,
+} from "../../types/chat";
 import MessageList from "../MessageList";
-import { ThemeToggle, StatusIndicator } from "../UI";
-import type { ConnectionStatus } from "../UI";
+import {
+  LazyTypingIndicator,
+  TypingIndicatorLoading,
+  preloadCriticalComponents,
+  preloadNonCriticalComponents,
+} from "../lazy/index";
+
 import ChatHeader from "./ChatHeader";
+import ChatInput from "./ChatInput";
 import "./Chatbot.scss";
 
-const Chatbot: React.FC = () => {
+const Chatbot: React.FC = memo(() => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { sendMessage, isConnected } = useSocket({
-    onMessage: (message: Message) => {
-      setMessages((prev) => [...prev, message]);
-      setIsTyping(false);
-    },
-    onTyping: () => setIsTyping(true),
-  });
+  // Memoized socket callbacks to prevent unnecessary re-renders
+  const socketCallbacks = useMemo(
+    () => ({
+      onMessage: (message: Message) => {
+        setMessages((prev) => [...prev, message]);
+        setIsTyping(false);
+      },
+      onTyping: () => setIsTyping(true),
+    }),
+    []
+  );
 
-  // Determine connection status for StatusIndicator
-  const getConnectionStatus = (): ConnectionStatus => {
-    if (isConnected) return "connected";
-    return "connecting";
-  };
+  const { sendMessage, isConnected } = useSocket(socketCallbacks);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping]);
+  }, [messages, isTyping, scrollToBottom]);
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim() || !isConnected) return;
+  // Preload components on mount
+  useEffect(() => {
+    preloadCriticalComponents();
 
-    sendMessage(inputValue);
-    setInputValue("");
-    setIsTyping(true);
-  };
+    // Preload non-critical components after a delay
+    const timer = setTimeout(() => {
+      preloadNonCriticalComponents();
+    }, 1000);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleSendMessage = useCallback(
+    (message: string) => {
+      if (!message.trim() || !isConnected) return;
+
+      // Create user message with sending status
+      const userMessage = createUserMessage(message);
+      setMessages((prev) => [...prev, userMessage]);
+
+      // Send message and update status
+      sendMessage(message);
+
+      // Update message status to sent after a brief delay (simulating network)
+      setTimeout(() => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === userMessage.id ? updateMessageStatus(msg, "sent") : msg
+          )
+        );
+      }, 500);
+
+      setInputValue("");
+      setIsTyping(true);
+    },
+    [isConnected, sendMessage]
+  );
+
+  // Memoized message list props
+  const messageListProps = useMemo(
+    () => ({
+      messages,
+      showTimestamps: true,
+      groupMessages: true,
+      timestampFormat: "relative" as const,
+      virtualScrolling: messages.length > 50,
+      height: 400,
+      maxCachedMessages: 1000,
+    }),
+    [messages]
+  );
 
   return (
     <div className="chatbot">
@@ -61,43 +114,27 @@ const Chatbot: React.FC = () => {
       />
 
       <div className="chatbot-messages">
-        <MessageList messages={messages} />
-        {isTyping && (
-          <div className="typing-indicator">
-            <Avatar icon={<Bot24Regular />} color="brand" size={32} />
-            <div className="typing-bubble">
-              <div className="typing-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <Text size={300}>AI is thinking...</Text>
-            </div>
-          </div>
-        )}
+        <MessageList {...messageListProps} />
+        <Suspense fallback={<TypingIndicatorLoading />}>
+          <LazyTypingIndicator isVisible={isTyping} />
+        </Suspense>
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="chatbot-input">
-        <Input
-          value={inputValue}
-          onChange={(_, data) => setInputValue(data.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="Ask me anything... ✨"
-          className="message-input"
-          contentAfter={
-            <Button
-              appearance="transparent"
-              icon={<Send24Regular />}
-              onClick={handleSendMessage}
-              disabled={!inputValue.trim() || !isConnected}
-              title={!isConnected ? "Connecting..." : "Send message"}
-            />
-          }
-        />
-      </div>
+      <ChatInput
+        value={inputValue}
+        onChange={setInputValue}
+        onSend={handleSendMessage}
+        isConnected={isConnected}
+        showCharCount={true}
+        maxLength={2000}
+        enableShortcuts={true}
+        placeholder="Ask me anything... ✨"
+      />
     </div>
   );
-};
+});
+
+Chatbot.displayName = "Chatbot";
 
 export default Chatbot;
